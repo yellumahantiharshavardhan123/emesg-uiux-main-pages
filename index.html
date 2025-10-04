@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-MESG - Premium Messaging Experience</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        teal: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-right': 'slideRight 0.3s ease-out',
+                        'bounce-subtle': 'bounceSubtle 0.6s ease-out',
+                        'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+                        'typing': 'typing 1.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideRight: {
+                            '0%': { opacity: '0', transform: 'translateX(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        bounceSubtle: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.05)' }
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' }
+                        },
+                        typing: {
+                            '0%, 100%': { opacity: '0.4' },
+                            '50%': { opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass-effect {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .message-bubble {
+            word-wrap: break-word;
+            max-width: 70%;
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-teal {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+        }
+        
+        .gradient-indigo {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Icon Component
+        const Icon = ({ name, size = 20, className = "" }) => {
+            const icons = {
+                Search: "🔍",
+                Bell: "🔔",
+                Moon: "🌙",
+                Sun: "☀️",
+                MessageCircle: "💬",
+                Users: "👥",
+                Circle: "📍",
+                Store: "🏪",
+                Wallet: "💰",
+                Bot: "🤖",
+                Briefcase: "💼",
+                Settings: "⚙️",
+                Send: "➤",
+                Smile: "😊",
+                Paperclip: "📎",
+                Mic: "🎤",
+                Phone: "📞",
+                Video: "📹",
+                MoreVertical: "⋮",
+                User: "👤",
+                Heart: "❤️",
+                ThumbsUp: "👍",
+                Laugh: "😂",
+                Pin: "📌",
+                Star: "⭐",
+                Check: "✓",
+                CheckCheck: "✓✓",
+                Play: "▶️",
+                Pause: "⏸️",
+                Download: "⬇️",
+                Image: "🖼️",
+                File: "📄",
+                Location: "📍",
+                CreditCard: "💳",
+                Shield: "🛡️",
+                Zap: "⚡",
+                Plus: "➕",
+                X: "✕",
+                ChevronRight: "›",
+                ChevronLeft: "‹",
+                Menu: "☰"
+            };
+            
+            return (
+                <span className={`inline-block ${className}`} style={{ fontSize: `${size}px` }}>
+                    {icons[name] || "❓"}
+                </span>
+            );
+        };
+
+        // Theme Context
+        const ThemeContext = React.createContext();
+
+        const ThemeProvider = ({ children }) => {
+            const [isDark, setIsDark] = useState(false);
+
+            const toggleTheme = () => {
+                setIsDark(!isDark);
+                document.documentElement.classList.toggle('dark');
+            };
+
+            return (
+                <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+                    {children}
+                </ThemeContext.Provider>
+            );
+        };
+
+        // Header Component
+        const Header = () => {
+            const { isDark, toggleTheme } = React.useContext(ThemeContext);
+            const [searchFocused, setSearchFocused] = useState(false);
+
+            return (
+                <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center px-6 shadow-sm z-50">
+                    <div className="flex items-center space-x-6 flex-1">
+                        {/* Logo */}
+                        <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                                <span className="text-white font-bold text-lg">E</span>
+                            </div>
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-teal-600 bg-clip-text text-transparent">
+                                E-MESG
+                            </h1>
+                        </div>
+                        
+                        {/* Search Bar */}
+                        <div className="flex-1 max-w-md">
+                            <div className={`relative transition-all duration-300 ${searchFocused ? 'scale-105' : ''}`}>
+                                <Icon name="Search" className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search messages, contacts..."
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                                    onFocus={() => setSearchFocused(true)}
+                                    onBlur={() => setSearchFocused(false)}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Actions */}
+                    <div className="flex items-center space-x-3">
+                        <button className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105 relative">
+                            <Icon name="Bell" className="text-gray-600 dark:text-gray-300" size={20} />
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse-soft"></div>
+                        </button>
+                        
+                        <button
+                            onClick={toggleTheme}
+                            className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105"
+                        >
+                            <Icon name={isDark ? "Sun" : "Moon"} className="text-gray-600 dark:text-gray-300" size={20} />
+                        </button>
+                        
+                        <div className="w-10 h-10 gradient-teal rounded-xl cursor-pointer shadow-lg hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+                            <Icon name="User" className="text-white" size={20} />
+                        </div>
+                    </div>
+                </header>
+            );
+        };
+
+        // Sidebar Component
+        const Sidebar = ({ activeTab, setActiveTab, isMobile, isOpen, setIsOpen }) => {
+            const sidebarItems = [
+                { id: 'chats', icon: 'MessageCircle', label: 'Chats', badge: 8 },
+                { id: 'groups', icon: 'Users', label: 'Groups', badge: 3 },
+                { id: 'status', icon: 'Circle', label: 'Status' },
+                { id: 'wallet', icon: 'Wallet', label: 'Wallet' },
+                { id: 'bots', icon: 'Bot', label: 'Bots' },
+                { id: 'settings', icon: 'Settings', label: 'Settings' },
+            ];
+
+            return (
+                <>
+                    {/* Mobile Overlay */}
+                    {isMobile && isOpen && (
+                        <div 
+                            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                            onClick={() => setIsOpen(false)}
+                        />
+                    )}
+                    
+                    <div className={`${
+                        isMobile 
+                            ? `fixed left-0 top-16 h-[calc(100vh-4rem)] z-50 transform transition-transform duration-300 ${
+                                isOpen ? 'translate-x-0' : '-translate-x-full'
+                              }`
+                            : 'relative'
+                    } w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col shadow-lg`}>
+                        
+                        {/* Navigation Tabs */}
+                        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                            <div className="grid grid-cols-2 gap-3">
+                                {sidebarItems.map((item) => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => {
+                                            setActiveTab(item.id);
+                                            if (isMobile) setIsOpen(false);
+                                        }}
+                                        className={`p-4 rounded-2xl transition-all duration-300 hover:scale-105 relative ${
+                                            activeTab === item.id
+                                                ? 'gradient-primary text-white shadow-lg'
+                                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-center space-y-2">
+                                            <Icon name={item.icon} size={24} />
+                                            <span className="text-sm font-semibold">{item.label}</span>
+                                        </div>
+                                        {item.badge && (
+                                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center animate-bounce-subtle">
+                                                {item.badge}
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto scrollbar-hide">
+                            <SidebarContent activeTab={activeTab} />
+                        </div>
+                    </div>
+                </>
+            );
+        };
+
+        // Sidebar Content Component
+        const SidebarContent = ({ activeTab }) => {
+            const renderContent = () => {
+                switch (activeTab) {
+                    case 'chats':
+                        return <ChatsList />;
+                    case 'groups':
+                        return <GroupsList />;
+                    case 'status':
+                        return <StatusList />;
+                    case 'wallet':
+                        return <WalletList />;
+                    case 'bots':
+                        return <BotsList />;
+                    case 'settings':
+                        return <SettingsList />;
+                    default:
+                        return <ChatsList />;
+                }
+            };
+
+            return (
+                <div className="animate-fade-in">
+                    {renderContent()}
+                </div>
+            );
+        };
+
+        // Chat List Component
+        const ChatsList = () => {
+            const chats = [
+                { 
+                    id: 1, 
+                    name: 'Sarah Johnson', 
+                    message: 'Hey! How are you doing today?', 
+                    time: '2m', 
+                    unread: 3, 
+                    avatar: '👩‍💼', 
+                    online: true,
+                    typing: false,
+                    lastSeen: 'online'
+                },
+                { 
+                    id: 2, 
+                    name: 'Alex Chen', 
+                    message: 'Thanks for the help with the project!', 
+                    time: '15m', 
+                    unread: 0, 
+                    avatar: '👨‍💻', 
+                    online: true,
+                    typing: true,
+                    lastSeen: 'online'
+                },
+                { 
+                    id: 3, 
+                    name: 'Emma Wilson', 
+                    message: 'See you at the meeting tomorrow', 
+                    time: '1h', 
+                    unread: 1, 
+                    avatar: '👩‍🎨', 
+                    online: false,
+                    typing: false,
+                    lastSeen: '2h ago'
+                },
+                { 
+                    id: 4, 
+                    name: 'Team Alpha', 
+                    message: 'Meeting rescheduled to 3 PM', 
+                    time: '2h', 
+                    unread: 5, 
+                    avatar: '👥', 
+                    online: false,
+                    typing: false,
+                    lastSeen: '1h ago'
+                },
+                { 
+                    id: 5, 
+                    name: 'Mom', 
+                    message: 'Don\'t forget dinner tonight!', 
+                    time: '3h', 
+                    unread: 0, 
+                    avatar: '👩‍🦳', 
+                    online: false,
+                    typing: false,
+                    lastSeen: '3h ago'
+                },
+            ];
+
+            return (
+                <div className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Chats</h2>
+                        <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                            <Icon name="Plus" className="text-gray-600 dark:text-gray-300" size={18} />
+                        </button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                        {chats.map((chat) => (
+                            <div
+                                key={chat.id}
+                                className="flex items-center p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300 group hover:scale-[1.02] hover:shadow-md"
+                            >
+                                <div className="relative">
+                                    <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center text-2xl shadow-lg">
+                                        {chat.avatar}
+                                    </div>
+                                    {chat.online && (
+                                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse-soft"></div>
+                                    )}
+                                </div>
+                                
+                                <div className="flex-1 ml-4 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white truncate">{chat.name}</h3>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">{chat.time}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <p className={`text-gray-600 dark:text-gray-300 truncate ${chat.typing ? 'text-teal-500 animate-typing' : ''}`}>
+                                            {chat.typing ? 'typing...' : chat.message}
+                                        </p>
+                                        {chat.unread > 0 && (
+                                            <div className="ml-3 bg-red-500 text-white text-sm rounded-full px-2 py-1 min-w-[24px] text-center animate-bounce-subtle">
+                                                {chat.unread}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Groups List Component
+        const GroupsList = () => {
+            const groups = [
+                { id: 1, name: 'Design Team', members: 12, message: 'New mockups ready for review', time: '30m', avatar: '🎨', active: 8 },
+                { id: 2, name: 'Family Group', members: 5, message: 'Weekend plans discussion', time: '1h', avatar: '👨‍👩‍👧‍👦', active: 3 },
+                { id: 3, name: 'Book Club', members: 15, message: 'Next book suggestions', time: '2h', avatar: '📚', active: 5 },
+                { id: 4, name: 'Fitness Buddies', members: 23, message: 'Morning run tomorrow?', time: '4h', avatar: '🏃‍♂️', active: 12 },
+            ];
+
+            return (
+                <div className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Groups</h2>
+                        <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                            <Icon name="Plus" className="text-gray-600 dark:text-gray-300" size={18} />
+                        </button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                        {groups.map((group) => (
+                            <div
+                                key={group.id}
+                                className="flex items-center p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
+                            >
+                                <div className="w-14 h-14 rounded-xl gradient-teal flex items-center justify-center text-2xl shadow-lg">
+                                    {group.avatar}
+                                </div>
+                                
+                                <div className="flex-1 ml-4 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white truncate">{group.name}</h3>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">{group.time}</span>
+                                    </div>
+                                    <p className="text-gray-600 dark:text-gray-300 truncate mb-1">{group.message}</p>
+                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                        <span>{group.members} members</span>
+                                        <span className="mx-2">•</span>
+                                        <span className="text-green-500">{group.active} active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Status List Component
+        const StatusList = () => {
+            const statuses = [
+                { id: 1, name: 'Your Story', avatar: '👤', isOwn: true, time: null },
+                { id: 2, name: 'Sarah', avatar: '👩‍💼', time: '2h ago', viewed: false },
+                { id: 3, name: 'Alex', avatar: '👨‍💻', time: '4h ago', viewed: true },
+                { id: 4, name: 'Emma', avatar: '👩‍🎨', time: '6h ago', viewed: false },
+            ];
+
+            return (
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Status Updates</h2>
+                    
+                    <div className="space-y-3">
+                        {statuses.map((status) => (
+                            <div
+                                key={status.id}
+                                className="flex items-center p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                            >
+                                <div className={`p-1 rounded-full ${
+                                    status.isOwn 
+                                        ? 'bg-gray-300 dark:bg-gray-600' 
+                                        : status.viewed 
+                                            ? 'bg-gray-300 dark:bg-gray-600'
+                                            : 'gradient-primary animate-pulse-soft'
+                                }`}>
+                                    <div className="w-14 h-14 rounded-full gradient-indigo flex items-center justify-center text-2xl">
+                                        {status.avatar}
+                                    </div>
+                                </div>
+                                
+                                <div className="ml-4">
+                                    <h4 className="font-semibold text-gray-900 dark:text-white">{status.name}</h4>
+                                    {status.time ? (
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm">{status.time}</p>
+                                    ) : (
+                                        <p className="text-teal-500 font-medium text-sm">Tap to add status</p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Marketplace List Component
+        const MarketplaceList = () => {
+            const items = [
+                { id: 1, name: 'iPhone 15 Pro', price: '$999', seller: 'TechStore', image: '📱', rating: 4.8 },
+                { id: 2, name: 'MacBook Air', price: '$1,299', seller: 'AppleHub', image: '💻', rating: 4.9 },
+                { id: 3, name: 'AirPods Pro', price: '$249', seller: 'AudioWorld', image: '🎧', rating: 4.7 },
+            ];
+
+            return (
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Marketplace</h2>
+                    
+                    <div className="space-y-3">
+                        {items.map((item) => (
+                            <div
+                                key={item.id}
+                                className="bg-white dark:bg-gray-700 rounded-xl p-4 hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02]"
+                            >
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-16 h-16 gradient-primary rounded-xl flex items-center justify-center text-3xl">
+                                        {item.image}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white">{item.name}</h3>
+                                        <p className="text-teal-600 dark:text-teal-400 font-bold text-lg">{item.price}</p>
+                                        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
+                                            <span>{item.seller}</span>
+                                            <span>•</span>
+                                            <span>⭐ {item.rating}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Wallet List Component
+        const WalletList = () => {
+            const transactions = [
+                { id: 1, type: 'received', amount: '$250.00', from: 'Sarah Johnson', time: '2h ago', status: 'completed' },
+                { id: 2, type: 'sent', amount: '$75.50', to: 'Coffee Shop', time: '1d ago', status: 'completed' },
+                { id: 3, type: 'received', amount: '$1,200.00', from: 'Freelance Work', time: '3d ago', status: 'completed' },
+            ];
+
+            return (
+                <div className="p-4">
+                    <div className="gradient-teal rounded-xl p-6 text-white mb-6">
+                        <h2 className="text-lg font-semibold mb-2">Wallet Balance</h2>
+                        <p className="text-3xl font-bold mb-4">$2,847.50</p>
+                        <div className="flex space-x-3">
+                            <button className="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg font-medium transition-all duration-300">
+                                Send
+                            </button>
+                            <button className="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg font-medium transition-all duration-300">
+                                Request
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Transactions</h3>
+                    
+                    <div className="space-y-3">
+                        {transactions.map((transaction) => (
+                            <div
+                                key={transaction.id}
+                                className="flex items-center p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300"
+                            >
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${
+                                    transaction.type === 'received' 
+                                        ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400' 
+                                        : 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
+                                }`}>
+                                    {transaction.type === 'received' ? '↓' : '↑'}
+                                </div>
+                                
+                                <div className="flex-1 ml-4">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h4 className="font-semibold text-gray-900 dark:text-white">
+                                            {transaction.type === 'received' ? transaction.from : transaction.to}
+                                        </h4>
+                                        <span className={`font-bold ${
+                                            transaction.type === 'received' 
+                                                ? 'text-green-600 dark:text-green-400' 
+                                                : 'text-red-600 dark:text-red-400'
+                                        }`}>
+                                            {transaction.type === 'received' ? '+' : '-'}{transaction.amount}
+                                        </span>
+                                    </div>
+                                    <p className="text-gray-600 dark:text-gray-300 text-sm">{transaction.time}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Bots List Component
+        const BotsList = () => {
+            const bots = [
+                { id: 1, name: 'AI Assistant', description: 'Smart help for everything', avatar: '🤖', active: true },
+                { id: 2, name: 'Weather Bot', description: 'Daily weather updates', avatar: '🌤️', active: false },
+                { id: 3, name: 'News Bot', description: 'Latest news and updates', avatar: '📰', active: true },
+                { id: 4, name: 'Translator', description: 'Real-time translation', avatar: '🌐', active: false },
+            ];
+
+            return (
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">AI Bots</h2>
+                    
+                    <div className="space-y-3">
+                        {bots.map((bot) => (
+                            <div
+                                key={bot.id}
+                                className="flex items-center p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                            >
+                                <div className="w-14 h-14 gradient-indigo rounded-xl flex items-center justify-center text-2xl shadow-lg">
+                                    {bot.avatar}
+                                </div>
+                                
+                                <div className="flex-1 ml-4">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white">{bot.name}</h3>
+                                        <div className={`w-3 h-3 rounded-full ${
+                                            bot.active ? 'bg-green-500 animate-pulse-soft' : 'bg-gray-300 dark:bg-gray-600'
+                                        }`}></div>
+                                    </div>
+                                    <p className="text-gray-600 dark:text-gray-300 text-sm">{bot.description}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Business List Component
+        const BusinessList = () => {
+            const businesses = [
+                { id: 1, name: 'Coffee Corner', category: 'Restaurant', distance: '0.2 mi', avatar: '☕', rating: 4.8 },
+                { id: 2, name: 'Tech Repair', category: 'Service', distance: '0.5 mi', avatar: '🔧', rating: 4.9 },
+                { id: 3, name: 'Fitness Plus', category: 'Gym', distance: '0.8 mi', avatar: '💪', rating: 4.7 },
+            ];
+
+            return (
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nearby Business</h2>
+                    
+                    <div className="space-y-3">
+                        {businesses.map((business) => (
+                            <div
+                                key={business.id}
+                                className="bg-white dark:bg-gray-700 rounded-xl p-4 hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02]"
+                            >
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-16 h-16 gradient-primary rounded-xl flex items-center justify-center text-3xl">
+                                        {business.avatar}
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white">{business.name}</h3>
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm">{business.category}</p>
+                                        <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                            <span>📍 {business.distance}</span>
+                                            <span>•</span>
+                                            <span>⭐ {business.rating}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Settings List Component
+        const SettingsList = () => {
+            const settings = [
+                { id: 1, name: 'Account', icon: 'User', description: 'Privacy, security, change number' },
+                { id: 2, name: 'Chats', icon: 'MessageCircle', description: 'Theme, wallpapers, chat history' },
+                { id: 3, name: 'Notifications', icon: 'Bell', description: 'Message, group & call tones' },
+                { id: 4, name: 'Storage', icon: 'File', description: 'Network usage, auto-download' },
+                { id: 5, name: 'Help', icon: 'Shield', description: 'Help center, contact us, privacy policy' },
+            ];
+
+            return (
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Settings</h2>
+                    
+                    <div className="space-y-2">
+                        {settings.map((setting) => (
+                            <div
+                                key={setting.id}
+                                className="flex items-center p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                            >
+                                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-600 rounded-xl flex items-center justify-center">
+                                    <Icon name={setting.icon} className="text-gray-600 dark:text-gray-300" size={20} />
+                                </div>
+                                
+                                <div className="flex-1 ml-4">
+                                    <h3 className="font-semibold text-gray-900 dark:text-white">{setting.name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 text-sm">{setting.description}</p>
+                                </div>
+                                
+                                <Icon name="ChevronRight" className="text-gray-400" size={16} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Main Content Component
+        const MainContent = ({ activeTab, selectedChat, rightPanelOpen, setRightPanelOpen }) => {
+            if (selectedChat) {
+                return <ChatWindow selectedChat={selectedChat} rightPanelOpen={rightPanelOpen} setRightPanelOpen={setRightPanelOpen} />;
+            }
+
+            return <MainScreen activeTab={activeTab} />;
+        };
+
+        // Main Screen Component
+        const MainScreen = ({ activeTab }) => {
+            const renderMainContent = () => {
+                switch (activeTab) {
+                    case 'chats':
+                        return <ChatsMainView />;
+                    case 'groups':
+                        return <GroupsMainView />;
+                    case 'status':
+                        return <StatusMainView />;
+                    case 'wallet':
+                        return <WalletMainView />;
+                    case 'bots':
+                        return <BotsMainView />;
+                    case 'settings':
+                        return <SettingsMainView />;
+                    default:
+                        return <ChatsMainView />;
+                }
+            };
+
+            return (
+                <div className="flex-1 bg-gradient-to-br from-gray-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 overflow-y-auto">
+                    {renderMainContent()}
+                </div>
+            );
+        };
+
+        // Chats Main View
+        const ChatsMainView = () => {
+            const recentChats = [
+                { id: 1, name: 'Sarah Johnson', message: 'Hey! How are you doing?', time: '2m', avatar: '👩‍💼', unread: 3, online: true },
+                { id: 2, name: 'Alex Chen', message: 'Thanks for the help!', time: '15m', avatar: '👨‍💻', unread: 0, online: true },
+                { id: 3, name: 'Emma Wilson', message: 'See you tomorrow', time: '1h', avatar: '👩‍🎨', unread: 1, online: false },
+                { id: 4, name: 'Mom', message: 'Don\'t forget dinner!', time: '3h', avatar: '👩‍🦳', unread: 0, online: false },
+            ];
+
+            const pinnedChats = [
+                { id: 5, name: 'Team Alpha', message: 'Meeting at 3 PM', time: '2h', avatar: '👥', unread: 5 },
+                { id: 6, name: 'Design Squad', message: 'New mockups ready', time: '4h', avatar: '🎨', unread: 2 },
+            ];
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Messages</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Stay connected with your conversations</p>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="gradient-primary rounded-2xl p-6 text-white cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <div className="flex items-center space-x-4">
+                                <div className="text-3xl">💬</div>
+                                <div>
+                                    <h3 className="text-xl font-semibold">New Chat</h3>
+                                    <p className="opacity-90">Start a conversation</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="gradient-teal rounded-2xl p-6 text-white cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <div className="flex items-center space-x-4">
+                                <div className="text-3xl">🤖</div>
+                                <div>
+                                    <h3 className="text-xl font-semibold">AI Assistant</h3>
+                                    <p className="opacity-90">Get smart help</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="gradient-indigo rounded-2xl p-6 text-white cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <div className="flex items-center space-x-4">
+                                <div className="text-3xl">📞</div>
+                                <div>
+                                    <h3 className="text-xl font-semibold">Voice Call</h3>
+                                    <p className="opacity-90">Call anyone</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pinned Chats */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <Icon name="Pin" className="mr-2" size={24} />
+                            Pinned Chats
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {pinnedChats.map((chat) => (
+                                <div key={chat.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-[1.02]">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center text-2xl shadow-lg">
+                                            {chat.avatar}
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{chat.name}</h3>
+                                            <p className="text-gray-600 dark:text-gray-300">{chat.message}</p>
+                                            <div className="flex items-center justify-between mt-2">
+                                                <span className="text-sm text-gray-500">{chat.time}</span>
+                                                {chat.unread > 0 && (
+                                                    <div className="bg-red-500 text-white text-sm rounded-full px-2 py-1 min-w-[24px] text-center">
+                                                        {chat.unread}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Recent Chats */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recent Conversations</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                            {recentChats.map((chat, index) => (
+                                <div key={chat.id} className={`flex items-center p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200 ${index !== recentChats.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
+                                    <div className="relative">
+                                        <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center text-2xl shadow-lg">
+                                            {chat.avatar}
+                                        </div>
+                                        {chat.online && (
+                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 ml-4">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">{chat.name}</h3>
+                                            <span className="text-sm text-gray-500">{chat.time}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-gray-600 dark:text-gray-300">{chat.message}</p>
+                                            {chat.unread > 0 && (
+                                                <div className="ml-3 bg-red-500 text-white text-sm rounded-full px-2 py-1 min-w-[24px] text-center">
+                                                    {chat.unread}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Groups Main View
+        const GroupsMainView = () => {
+            const communities = [
+                { id: 1, name: 'Tech Innovators', members: 1247, category: 'Technology', avatar: '💻', description: 'Latest in tech and innovation' },
+                { id: 2, name: 'Design Masters', members: 892, category: 'Design', avatar: '🎨', description: 'Creative design community' },
+                { id: 3, name: 'Startup Hub', members: 2156, category: 'Business', avatar: '🚀', description: 'Entrepreneurs and startups' },
+            ];
+
+            const myGroups = [
+                { id: 4, name: 'Family Group', members: 5, lastMessage: 'Weekend plans?', time: '1h', avatar: '👨‍👩‍👧‍👦' },
+                { id: 5, name: 'Work Team', members: 12, lastMessage: 'Meeting tomorrow', time: '2h', avatar: '💼' },
+                { id: 6, name: 'Book Club', members: 15, lastMessage: 'Next book suggestions', time: '4h', avatar: '📚' },
+            ];
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Communities & Groups</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Connect with like-minded people</p>
+                    </div>
+
+                    {/* Featured Communities */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Featured Communities</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {communities.map((community) => (
+                                <div key={community.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-[1.02]">
+                                    <div className="text-center mb-4">
+                                        <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+                                            {community.avatar}
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{community.name}</h3>
+                                        <p className="text-gray-600 dark:text-gray-300 mb-2">{community.description}</p>
+                                        <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                                            <span>{community.members.toLocaleString()} members</span>
+                                            <span>•</span>
+                                            <span>{community.category}</span>
+                                        </div>
+                                    </div>
+                                    <button className="w-full gradient-primary text-white py-3 rounded-xl font-semibold hover:scale-105 transition-transform duration-300">
+                                        Join Community
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* My Groups */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">My Groups</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                            {myGroups.map((group, index) => (
+                                <div key={group.id} className={`flex items-center p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200 ${index !== myGroups.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
+                                    <div className="w-16 h-16 rounded-2xl gradient-teal flex items-center justify-center text-2xl shadow-lg">
+                                        {group.avatar}
+                                    </div>
+                                    <div className="flex-1 ml-4">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{group.name}</h3>
+                                            <span className="text-sm text-gray-500">{group.time}</span>
+                                        </div>
+                                        <p className="text-gray-600 dark:text-gray-300 mb-1">{group.lastMessage}</p>
+                                        <p className="text-sm text-gray-500">{group.members} members</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Status Main View
+        const StatusMainView = () => {
+            const statuses = [
+                { id: 1, user: 'Sarah', avatar: '👩‍💼', time: '2h ago', preview: 'At the beach 🏖️', color: 'from-blue-400 to-teal-400' },
+                { id: 2, user: 'Alex', avatar: '👨‍💻', time: '4h ago', preview: 'New project launch! 🚀', color: 'from-purple-400 to-pink-400' },
+                { id: 3, user: 'Emma', avatar: '👩‍🎨', time: '6h ago', preview: 'Art gallery visit 🎨', color: 'from-yellow-400 to-orange-400' },
+                { id: 4, user: 'Team', avatar: '👥', time: '8h ago', preview: 'Office celebration 🎉', color: 'from-green-400 to-blue-400' },
+            ];
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Status Updates</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Share your moments with friends</p>
+                    </div>
+
+                    {/* Add Your Status */}
+                    <div className="mb-8">
+                        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-8 text-white cursor-pointer hover:scale-[1.02] transition-transform duration-300 shadow-lg">
+                            <div className="flex items-center space-x-6">
+                                <div className="w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center text-3xl">
+                                    ➕
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-2">Share Your Status</h2>
+                                    <p className="text-lg opacity-90">Let your friends know what you're up to</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Statuses */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recent Updates</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {statuses.map((status) => (
+                                <div key={status.id} className="cursor-pointer hover:scale-105 transition-transform duration-300">
+                                    <div className={`bg-gradient-to-br ${status.color} rounded-2xl p-1 shadow-lg`}>
+                                        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 h-64 flex flex-col">
+                                            <div className="flex items-center space-x-3 mb-4">
+                                                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-xl">
+                                                    {status.avatar}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-900 dark:text-white">{status.user}</h3>
+                                                    <p className="text-sm text-gray-500">{status.time}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 flex items-center justify-center">
+                                                <p className="text-lg text-center text-gray-700 dark:text-gray-300">{status.preview}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Marketplace Main View
+        const MarketplaceMainView = () => {
+            const categories = [
+                { id: 1, name: 'Electronics', icon: '📱', count: 234 },
+                { id: 2, name: 'Fashion', icon: '👕', count: 156 },
+                { id: 3, name: 'Home & Garden', icon: '🏠', count: 89 },
+                { id: 4, name: 'Sports', icon: '⚽', count: 67 },
+            ];
+
+            const featuredItems = [
+                { id: 1, name: 'iPhone 15 Pro Max', price: '$1,199', image: '📱', seller: 'TechStore', rating: 4.9, location: '2.1 mi' },
+                { id: 2, name: 'MacBook Pro 16"', price: '$2,399', image: '💻', seller: 'AppleHub', rating: 4.8, location: '1.5 mi' },
+                { id: 3, name: 'AirPods Pro 2', price: '$249', image: '🎧', seller: 'AudioWorld', rating: 4.7, location: '0.8 mi' },
+                { id: 4, name: 'iPad Air', price: '$599', image: '📱', seller: 'TabletZone', rating: 4.6, location: '3.2 mi' },
+            ];
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Marketplace</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Buy and sell with people nearby</p>
+                    </div>
+
+                    {/* Categories */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Categories</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {categories.map((category) => (
+                                <div key={category.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg">
+                                    <div className="text-4xl mb-3">{category.icon}</div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{category.name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 text-sm">{category.count} items</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Featured Items */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Featured Items</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {featuredItems.map((item) => (
+                                <div key={item.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-[1.02]">
+                                    <div className="gradient-primary h-48 flex items-center justify-center text-6xl">
+                                        {item.image}
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{item.name}</h3>
+                                        <p className="text-2xl font-bold text-teal-600 dark:text-teal-400 mb-2">{item.price}</p>
+                                        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
+                                            <span>{item.seller}</span>
+                                            <span>⭐ {item.rating}</span>
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-1">📍 {item.location}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Wallet Main View
+        const WalletMainView = () => {
+            const quickActions = [
+                { id: 1, name: 'Send Money', icon: '💸', color: 'gradient-primary' },
+                { id: 2, name: 'Request', icon: '📥', color: 'gradient-teal' },
+                { id: 3, name: 'Pay Bills', icon: '🧾', color: 'gradient-indigo' },
+                { id: 4, name: 'Top Up', icon: '⬆️', color: 'bg-green-500' },
+            ];
+
+            const recentTransactions = [
+                { id: 1, type: 'received', amount: '$250.00', from: 'Sarah Johnson', time: '2h ago', status: 'completed' },
+                { id: 2, type: 'sent', amount: '$75.50', to: 'Coffee Shop', time: '1d ago', status: 'completed' },
+                { id: 3, type: 'received', amount: '$1,200.00', from: 'Freelance Work', time: '3d ago', status: 'completed' },
+                { id: 4, type: 'sent', amount: '$45.00', to: 'Uber Ride', time: '5d ago', status: 'completed' },
+            ];
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Wallet</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Manage your money seamlessly</p>
+                    </div>
+
+                    {/* Balance Card */}
+                    <div className="gradient-teal rounded-2xl p-8 text-white mb-8 shadow-lg">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-lg font-medium opacity-90 mb-2">Total Balance</h2>
+                                <p className="text-4xl font-bold">$2,847.50</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm opacity-90">This Month</p>
+                                <p className="text-xl font-semibold text-green-200">+$1,234.50</p>
+                            </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {quickActions.map((action) => (
+                                <button
+                                    key={action.id}
+                                    className="bg-white bg-opacity-20 hover:bg-opacity-30 rounded-xl p-4 transition-all duration-300 hover:scale-105"
+                                >
+                                    <div className="text-2xl mb-2">{action.icon}</div>
+                                    <p className="font-medium">{action.name}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Recent Transactions */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recent Transactions</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                            {recentTransactions.map((transaction, index) => (
+                                <div key={transaction.id} className={`flex items-center p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200 ${index !== recentTransactions.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
+                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl ${
+                                        transaction.type === 'received' 
+                                            ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400' 
+                                            : 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
+                                    }`}>
+                                        {transaction.type === 'received' ? '↓' : '↑'}
+                                    </div>
+                                    
+                                    <div className="flex-1 ml-4">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">
+                                                {transaction.type === 'received' ? transaction.from : transaction.to}
+                                            </h3>
+                                            <span className={`text-lg font-bold ${
+                                                transaction.type === 'received' 
+                                                    ? 'text-green-600 dark:text-green-400' 
+                                                    : 'text-red-600 dark:text-red-400'
+                                            }`}>
+                                                {transaction.type === 'received' ? '+' : '-'}{transaction.amount}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-gray-600 dark:text-gray-300 text-sm">{transaction.time}</p>
+                                            <span className="text-green-500 text-sm font-medium">✓ {transaction.status}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Bots Main View
+        const BotsMainView = () => {
+            const featuredBots = [
+                { id: 1, name: 'AI Assistant', description: 'Smart help for everything you need', avatar: '🤖', category: 'Productivity', rating: 4.9, users: '2.1M' },
+                { id: 2, name: 'Weather Bot', description: 'Daily weather updates and forecasts', avatar: '🌤️', category: 'Utility', rating: 4.7, users: '890K' },
+                { id: 3, name: 'News Bot', description: 'Latest news and breaking updates', avatar: '📰', category: 'News', rating: 4.8, users: '1.5M' },
+                { id: 4, name: 'Translator', description: 'Real-time language translation', avatar: '🌐', category: 'Communication', rating: 4.6, users: '750K' },
+            ];
+
+            const myBots = [
+                { id: 5, name: 'AI Assistant', active: true, lastUsed: '2m ago' },
+                { id: 6, name: 'Weather Bot', active: false, lastUsed: '1h ago' },
+                { id: 7, name: 'News Bot', active: true, lastUsed: '30m ago' },
+            ];
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">AI Bots</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Enhance your messaging with smart bots</p>
+                    </div>
+
+                    {/* Featured Bots */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Featured Bots</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {featuredBots.map((bot) => (
+                                <div key={bot.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-[1.02]">
+                                    <div className="text-center mb-4">
+                                        <div className="w-16 h-16 gradient-indigo rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+                                            {bot.avatar}
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{bot.name}</h3>
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">{bot.description}</p>
+                                        <div className="flex items-center justify-center space-x-4 text-xs text-gray-500 mb-4">
+                                            <span>⭐ {bot.rating}</span>
+                                            <span>•</span>
+                                            <span>{bot.users} users</span>
+                                        </div>
+                                        <span className="inline-block bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-xs">
+                                            {bot.category}
+                                        </span>
+                                    </div>
+                                    <button className="w-full gradient-primary text-white py-3 rounded-xl font-semibold hover:scale-105 transition-transform duration-300">
+                                        Add Bot
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* My Bots */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">My Bots</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                            {myBots.map((bot, index) => (
+                                <div key={bot.id} className={`flex items-center p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200 ${index !== myBots.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''}`}>
+                                    <div className="w-14 h-14 gradient-indigo rounded-xl flex items-center justify-center text-2xl shadow-lg">
+                                        🤖
+                                    </div>
+                                    <div className="flex-1 ml-4">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white">{bot.name}</h3>
+                                            <div className={`w-3 h-3 rounded-full ${
+                                                bot.active ? 'bg-green-500 animate-pulse-soft' : 'bg-gray-300 dark:bg-gray-600'
+                                            }`}></div>
+                                        </div>
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm">Last used: {bot.lastUsed}</p>
+                                    </div>
+                                    <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                        <Icon name="Settings" size={20} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Business Main View
+        const BusinessMainView = () => {
+            const businessCategories = [
+                { id: 1, name: 'Restaurants', icon: '🍽️', count: 45 },
+                { id: 2, name: 'Services', icon: '🔧', count: 32 },
+                { id: 3, name: 'Shopping', icon: '🛍️', count: 28 },
+                { id: 4, name: 'Health', icon: '🏥', count: 19 },
+            ];
+
+            const nearbyBusinesses = [
+                { id: 1, name: 'Coffee Corner', category: 'Restaurant', distance: '0.2 mi', avatar: '☕', rating: 4.8, hours: 'Open until 9 PM' },
+                { id: 2, name: 'Tech Repair Pro', category: 'Service', distance: '0.5 mi', avatar: '🔧', rating: 4.9, hours: 'Open until 6 PM' },
+                { id: 3, name: 'Fitness Plus Gym', category: 'Health', distance: '0.8 mi', avatar: '💪', rating: 4.7, hours: 'Open 24/7' },
+                { id: 4, name: 'Fashion Boutique', category: 'Shopping', distance: '1.2 mi', avatar: '👗', rating: 4.6, hours: 'Open until 8 PM' },
+            ];
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Business Directory</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Connect with local businesses</p>
+                    </div>
+
+                    {/* Business Categories */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Categories</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {businessCategories.map((category) => (
+                                <div key={category.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg">
+                                    <div className="text-4xl mb-3">{category.icon}</div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{category.name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 text-sm">{category.count} nearby</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Nearby Businesses */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Nearby Businesses</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {nearbyBusinesses.map((business) => (
+                                <div key={business.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-[1.02]">
+                                    <div className="flex items-start space-x-4">
+                                        <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                                            {business.avatar}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{business.name}</h3>
+                                                <span className="text-sm text-gray-500">📍 {business.distance}</span>
+                                            </div>
+                                            <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">{business.category}</p>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-2 text-sm">
+                                                    <span className="text-yellow-500">⭐ {business.rating}</span>
+                                                    <span className="text-green-500">• {business.hours}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex space-x-2 mt-4">
+                                                <button className="flex-1 gradient-primary text-white py-2 rounded-lg font-medium hover:scale-105 transition-transform duration-300">
+                                                    Message
+                                                </button>
+                                                <button className="flex-1 gradient-teal text-white py-2 rounded-lg font-medium hover:scale-105 transition-transform duration-300">
+                                                    Call
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Settings Main View
+        const SettingsMainView = () => {
+            const settingsGroups = [
+                {
+                    title: 'Account',
+                    items: [
+                        { id: 1, name: 'Profile', description: 'Update your personal information', icon: 'User' },
+                        { id: 2, name: 'Privacy', description: 'Control who can see your info', icon: 'Shield' },
+                        { id: 3, name: 'Security', description: 'Two-factor authentication, password', icon: 'Lock' },
+                    ]
+                },
+                {
+                    title: 'Preferences',
+                    items: [
+                        { id: 4, name: 'Notifications', description: 'Message, group & call tones', icon: 'Bell' },
+                        { id: 5, name: 'Chat Settings', description: 'Theme, wallpapers, font size', icon: 'MessageCircle' },
+                        { id: 6, name: 'Language', description: 'Choose your preferred language', icon: 'Globe' },
+                    ]
+                },
+                {
+                    title: 'Data & Storage',
+                    items: [
+                        { id: 7, name: 'Storage Usage', description: 'Manage your storage space', icon: 'File' },
+                        { id: 8, name: 'Network Usage', description: 'Monitor data consumption', icon: 'Wifi' },
+                        { id: 9, name: 'Auto-Download', description: 'Media download preferences', icon: 'Download' },
+                    ]
+                }
+            ];
+
+            return (
+                <div className="p-8 max-w-4xl mx-auto animate-fade-in">
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Settings</h1>
+                        <p className="text-xl text-gray-600 dark:text-gray-300">Customize your E-MESG experience</p>
+                    </div>
+
+                    {/* Profile Card */}
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg mb-8">
+                        <div className="flex items-center space-x-4">
+                            <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                                👤
+                            </div>
+                            <div className="flex-1">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">John Doe</h2>
+                                <p className="text-gray-600 dark:text-gray-300 mb-2">+1 (555) 123-4567</p>
+                                <p className="text-gray-500 text-sm">Available</p>
+                            </div>
+                            <button className="gradient-primary text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-transform duration-300">
+                                Edit Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Settings Groups */}
+                    <div className="space-y-8">
+                        {settingsGroups.map((group, groupIndex) => (
+                            <div key={groupIndex}>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{group.title}</h2>
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                                    {group.items.map((item, index) => (
+                                        <div
+                                            key={item.id}
+                                            className={`flex items-center p-6 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200 ${
+                                                index !== group.items.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''
+                                            }`}
+                                        >
+                                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-600 rounded-xl flex items-center justify-center mr-4">
+                                                <Icon name={item.icon} className="text-gray-600 dark:text-gray-300" size={20} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{item.name}</h3>
+                                                <p className="text-gray-600 dark:text-gray-300 text-sm">{item.description}</p>
+                                            </div>
+                                            <Icon name="ChevronRight" className="text-gray-400" size={20} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Chat Window Component
+        const ChatWindow = ({ selectedChat, rightPanelOpen, setRightPanelOpen }) => {
+            const [message, setMessage] = useState('');
+            const [isRecording, setIsRecording] = useState(false);
+            const [messages, setMessages] = useState([
+                { 
+                    id: 1, 
+                    text: 'Hey! How are you doing today?', 
+                    sender: 'other', 
+                    time: '10:30 AM', 
+                    avatar: '👩‍💼',
+                    status: 'read',
+                    reactions: []
+                },
+                { 
+                    id: 2, 
+                    text: 'I\'m doing great! Just working on the new E-MESG project. The UI is looking amazing!', 
+                    sender: 'me', 
+                    time: '10:32 AM',
+                    status: 'read',
+                    reactions: [{ emoji: '👍', count: 1 }]
+                },
+                { 
+                    id: 3, 
+                    text: 'That sounds exciting! Can you tell me more about the features?', 
+                    sender: 'other', 
+                    time: '10:33 AM', 
+                    avatar: '👩‍💼',
+                    status: 'read',
+                    reactions: []
+                },
+                { 
+                    id: 4, 
+                    text: 'Sure! It has AI integration, voice messages, payments, and so much more. The design is world-class!', 
+                    sender: 'me', 
+                    time: '10:35 AM',
+                    status: 'delivered',
+                    reactions: [{ emoji: '🔥', count: 1 }, { emoji: '❤️', count: 1 }]
+                },
+                {
+                    id: 5,
+                    type: 'ai',
+                    text: 'I can help you with that! Would you like me to suggest some features for your messaging app?',
+                    sender: 'ai',
+                    time: '10:36 AM',
+                    avatar: '🤖',
+                    status: 'read',
+                    reactions: []
+                }
+            ]);
+
+            const sendMessage = (e) => {
+                e.preventDefault();
+                if (message.trim()) {
+                    const newMessage = {
+                        id: messages.length + 1,
+                        text: message,
+                        sender: 'me',
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        status: 'sent',
+                        reactions: []
+                    };
+                    setMessages([...messages, newMessage]);
+                    setMessage('');
+                }
+            };
+
+            const quickReplies = ['Sounds great!', 'Tell me more', 'When can we meet?', 'Perfect!'];
+
+            return (
+                <div className="flex-1 flex flex-col bg-white dark:bg-gray-800">
+                    {/* Chat Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-teal-50 dark:from-gray-700 dark:to-gray-600">
+                        <div className="flex items-center space-x-4">
+                            <div className="relative">
+                                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center text-2xl shadow-lg">
+                                    👩‍💼
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse-soft"></div>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Sarah Johnson</h3>
+                                <p className="text-green-500 font-medium text-sm">Online</p>
+                            </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                            <button className="p-3 rounded-xl hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105">
+                                <Icon name="Phone" className="text-gray-600 dark:text-gray-300" size={20} />
+                            </button>
+                            <button className="p-3 rounded-xl hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105">
+                                <Icon name="Video" className="text-gray-600 dark:text-gray-300" size={20} />
+                            </button>
+                            <button 
+                                onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                                className={`p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
+                                    rightPanelOpen 
+                                        ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400' 
+                                        : 'hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
+                                }`}
+                            >
+                                <Icon name="MoreVertical" size={20} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Messages Area */}
+                    <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-4 bg-gradient-to-br from-gray-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+                        {messages.map((msg) => (
+                            <div
+                                key={msg.id}
+                                className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'} animate-slide-up`}
+                            >
+                                <div className={`message-bubble ${
+                                    msg.sender === 'me'
+                                        ? 'gradient-primary text-white shadow-lg'
+                                        : msg.type === 'ai'
+                                            ? 'gradient-indigo text-white shadow-lg'
+                                            : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-lg'
+                                } rounded-2xl px-6 py-4 relative group`}>
+                                    {msg.type === 'ai' && (
+                                        <div className="flex items-center space-x-2 mb-2">
+                                            <Icon name="Bot" size={16} />
+                                            <span className="text-sm font-medium opacity-90">AI Assistant</span>
+                                        </div>
+                                    )}
+                                    <p className="text-base leading-relaxed">{msg.text}</p>
+                                    <div className="flex items-center justify-between mt-3">
+                                        <p className={`text-sm ${
+                                            msg.sender === 'me' || msg.type === 'ai' ? 'text-white opacity-75' : 'text-gray-500 dark:text-gray-400'
+                                        }`}>
+                                            {msg.time}
+                                        </p>
+                                        {msg.sender === 'me' && (
+                                            <div className="flex items-center space-x-1">
+                                                <Icon 
+                                                    name={msg.status === 'read' ? 'CheckCheck' : 'Check'} 
+                                                    className={`${
+                                                        msg.status === 'read' ? 'text-blue-200' : 'text-white opacity-75'
+                                                    }`} 
+                                                    size={16} 
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Reactions */}
+                                    {msg.reactions && msg.reactions.length > 0 && (
+                                        <div className="flex space-x-1 mt-2">
+                                            {msg.reactions.map((reaction, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="bg-white dark:bg-gray-600 rounded-full px-2 py-1 text-sm flex items-center space-x-1 shadow-md"
+                                                >
+                                                    <span>{reaction.emoji}</span>
+                                                    <span className="text-gray-600 dark:text-gray-300">{reaction.count}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Quick Replies */}
+                    <div className="px-4 py-2 bg-white dark:bg-gray-800">
+                        <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
+                            {quickReplies.map((reply, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setMessage(reply)}
+                                    className="flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 hover:scale-105"
+                                >
+                                    {reply}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Message Input */}
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                        <form onSubmit={sendMessage} className="flex items-end space-x-3">
+                            <div className="flex space-x-2">
+                                <button
+                                    type="button"
+                                    className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105"
+                                >
+                                    <Icon name="Paperclip" className="text-gray-600 dark:text-gray-300" size={20} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-105"
+                                >
+                                    <Icon name="Image" className="text-gray-600 dark:text-gray-300" size={20} />
+                                </button>
+                            </div>
+                            
+                            <div className="flex-1 relative">
+                                <textarea
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Type a message..."
+                                    className="w-full px-6 py-4 bg-gray-100 dark:bg-gray-700 border-0 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 resize-none"
+                                    rows="1"
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            sendMessage(e);
+                                        }
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute right-3 bottom-3 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300"
+                                >
+                                    <Icon name="Smile" className="text-gray-600 dark:text-gray-300" size={18} />
+                                </button>
+                            </div>
+                            
+                            <div className="flex space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsRecording(!isRecording)}
+                                    className={`p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
+                                        isRecording 
+                                            ? 'bg-red-500 text-white animate-pulse-soft' 
+                                            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
+                                    }`}
+                                >
+                                    <Icon name="Mic" size={20} />
+                                </button>
+                                
+                                <button
+                                    type="submit"
+                                    className="gradient-primary text-white p-3 rounded-xl hover:scale-105 transition-all duration-300 shadow-lg"
+                                >
+                                    <Icon name="Send" size={20} />
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // Right Panel Component
+        const RightPanel = ({ isOpen, onClose }) => {
+            const [activeTab, setActiveTab] = useState('profile');
+
+            const tabs = [
+                { id: 'profile', label: 'Profile', icon: 'User' },
+                { id: 'media', label: 'Media', icon: 'Image' },
+                { id: 'payments', label: 'Payments', icon: 'CreditCard' },
+                { id: 'ai', label: 'AI Tools', icon: 'Bot' },
+            ];
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col shadow-lg animate-slide-right">
+                    {/* Header */}
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Chat Info</h3>
+                            <button
+                                onClick={onClose}
+                                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                            >
+                                <Icon name="X" className="text-gray-600 dark:text-gray-300" size={18} />
+                            </button>
+                        </div>
+                        
+                        {/* Tabs */}
+                        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex-1 flex items-center justify-center space-x-1 py-2 px-3 rounded-lg transition-all duration-300 ${
+                                        activeTab === tab.id
+                                            ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                                    }`}
+                                >
+                                    <Icon name={tab.icon} size={16} />
+                                    <span className="text-sm font-medium">{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
+                        {activeTab === 'profile' && <ProfileTab />}
+                        {activeTab === 'media' && <MediaTab />}
+                        {activeTab === 'payments' && <PaymentsTab />}
+                        {activeTab === 'ai' && <AITab />}
+                    </div>
+                </div>
+            );
+        };
+
+        // Profile Tab Component
+        const ProfileTab = () => (
+            <div className="space-y-6">
+                <div className="text-center">
+                    <div className="w-24 h-24 gradient-primary rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg">
+                        👩‍💼
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Sarah Johnson</h3>
+                    <p className="text-gray-600 dark:text-gray-300">Product Designer</p>
+                    <div className="flex items-center justify-center space-x-2 mt-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse-soft"></div>
+                        <span className="text-green-500 font-medium">Online</span>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <div className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
+                        <Icon name="Phone" className="text-gray-600 dark:text-gray-300" size={20} />
+                        <div>
+                            <p className="font-medium text-gray-900 dark:text-white">+1 (555) 123-4567</p>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">Mobile</p>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
+                        <Icon name="Location" className="text-gray-600 dark:text-gray-300" size={20} />
+                        <div>
+                            <p className="font-medium text-gray-900 dark:text-white">San Francisco, CA</p>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">Location</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                    <button className="gradient-primary text-white py-3 rounded-xl font-medium hover:scale-105 transition-transform duration-300">
+                        Call
+                    </button>
+                    <button className="gradient-teal text-white py-3 rounded-xl font-medium hover:scale-105 transition-transform duration-300">
+                        Video
+                    </button>
+                </div>
+            </div>
+        );
+
+        // Media Tab Component
+        const MediaTab = () => (
+            <div className="space-y-4">
+                <h4 className="font-semibold text-gray-900 dark:text-white">Shared Media</h4>
+                <div className="grid grid-cols-3 gap-2">
+                    {[1, 2, 3, 4, 5, 6].map((item) => (
+                        <div
+                            key={item}
+                            className="aspect-square bg-gradient-to-br from-indigo-400 to-teal-400 rounded-xl cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg"
+                        />
+                    ))}
+                </div>
+                
+                <h4 className="font-semibold text-gray-900 dark:text-white mt-6">Shared Files</h4>
+                <div className="space-y-3">
+                    {['Project_Proposal.pdf', 'Design_Assets.zip', 'Meeting_Notes.docx'].map((file, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
+                        >
+                            <div className="w-10 h-10 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                                <Icon name="File" size={18} />
+                            </div>
+                            <div className="flex-1">
+                                <p className="font-medium text-gray-900 dark:text-white text-sm">{file}</p>
+                                <p className="text-gray-600 dark:text-gray-300 text-xs">2.4 MB</p>
+                            </div>
+                            <Icon name="Download" className="text-gray-600 dark:text-gray-300" size={16} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        // Payments Tab Component
+        const PaymentsTab = () => (
+            <div className="space-y-6">
+                <div className="gradient-teal rounded-xl p-4 text-white">
+                    <h4 className="font-semibold mb-2">Quick Pay</h4>
+                    <p className="text-sm opacity-90 mb-4">Send money instantly</p>
+                    <div className="flex space-x-2">
+                        <button className="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg font-medium transition-all duration-300">
+                            $10
+                        </button>
+                        <button className="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg font-medium transition-all duration-300">
+                            $25
+                        </button>
+                        <button className="flex-1 bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg font-medium transition-all duration-300">
+                            $50
+                        </button>
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <h4 className="font-semibold text-gray-900 dark:text-white">Recent Transactions</h4>
+                    {[
+                        { amount: '$25.00', type: 'sent', date: '2 days ago' },
+                        { amount: '$12.50', type: 'received', date: '1 week ago' },
+                    ].map((transaction, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
+                        >
+                            <div>
+                                <p className={`font-medium ${
+                                    transaction.type === 'sent' 
+                                        ? 'text-red-600 dark:text-red-400' 
+                                        : 'text-green-600 dark:text-green-400'
+                                }`}>
+                                    {transaction.type === 'sent' ? '-' : '+'}{transaction.amount}
+                                </p>
+                                <p className="text-gray-600 dark:text-gray-300 text-sm">{transaction.date}</p>
+                            </div>
+                            <Icon name="ChevronRight" className="text-gray-400" size={16} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        // AI Tab Component
+        const AITab = () => (
+            <div className="space-y-6">
+                <div className="gradient-indigo rounded-xl p-4 text-white">
+                    <div className="flex items-center space-x-3 mb-3">
+                        <Icon name="Bot" size={24} />
+                        <h4 className="font-semibold">AI Assistant</h4>
+                    </div>
+                    <p className="text-sm opacity-90 mb-4">Smart features for this chat</p>
+                    <button className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 py-2 rounded-lg font-medium transition-all duration-300">
+                        Start AI Chat
+                    </button>
+                </div>
+
+                <div className="space-y-3">
+                    {[
+                        { title: 'Smart Replies', desc: 'AI-powered suggestions', icon: 'Zap' },
+                        { title: 'Translate', desc: 'Real-time translation', icon: 'Languages' },
+                        { title: 'Summarize', desc: 'Chat summaries', icon: 'File' },
+                        { title: 'Schedule', desc: 'Smart scheduling', icon: 'Calendar' },
+                    ].map((feature, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
+                        >
+                            <div className="w-10 h-10 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                                <Icon name={feature.icon} size={18} />
+                            </div>
+                            <div>
+                                <p className="font-medium text-gray-900 dark:text-white text-sm">{feature.title}</p>
+                                <p className="text-gray-600 dark:text-gray-300 text-xs">{feature.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        // Main App Component
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('chats');
+            const [selectedChat, setSelectedChat] = useState(null); // Start with main screen
+            const [rightPanelOpen, setRightPanelOpen] = useState(false);
+            const [sidebarOpen, setSidebarOpen] = useState(false);
+            const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+            useEffect(() => {
+                const handleResize = () => {
+                    setIsMobile(window.innerWidth < 1024);
+                };
+                window.addEventListener('resize', handleResize);
+                return () => window.removeEventListener('resize', handleResize);
+            }, []);
+
+            return (
+                <ThemeProvider>
+                    <div className="h-screen flex flex-col overflow-hidden">
+                        <Header />
+                        <div className="flex-1 flex overflow-hidden relative">
+                            {/* Mobile Menu Button */}
+                            {isMobile && !selectedChat && (
+                                <button
+                                    onClick={() => setSidebarOpen(true)}
+                                    className="fixed top-20 left-4 z-50 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg lg:hidden"
+                                >
+                                    <Icon name="Menu" className="text-gray-600 dark:text-gray-300" size={20} />
+                                </button>
+                            )}
+
+                            <Sidebar 
+                                activeTab={activeTab} 
+                                setActiveTab={setActiveTab}
+                                isMobile={isMobile}
+                                isOpen={sidebarOpen}
+                                setIsOpen={setSidebarOpen}
+                            />
+                            <MainContent 
+                                activeTab={activeTab}
+                                selectedChat={selectedChat}
+                                rightPanelOpen={rightPanelOpen}
+                                setRightPanelOpen={setRightPanelOpen}
+                            />
+                            <RightPanel 
+                                isOpen={rightPanelOpen} 
+                                onClose={() => setRightPanelOpen(false)}
+                            />
+                        </div>
+                    </div>
+                </ThemeProvider>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98930f49f39b4da5',t:'MTc1OTU2MzkyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

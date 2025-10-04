@@ -276,6 +276,7 @@
                 { id: 'groups', icon: 'Users', label: 'Groups', badge: 3 },
                 { id: 'status', icon: 'Circle', label: 'Status' },
                 { id: 'meetings', icon: 'Video', label: 'Meetings', badge: 2 },
+                { id: 'location', icon: 'Location', label: 'Location' },
                 { id: 'wallet', icon: 'Wallet', label: 'Wallet' },
                 { id: 'bots', icon: 'Bot', label: 'Bots' },
                 { id: 'settings', icon: 'Settings', label: 'Settings' },
@@ -352,6 +353,8 @@
                         return <WalletList />;
                     case 'meetings':
                         return <MeetingsList />;
+                    case 'location':
+                        return <LocationList />;
                     case 'bots':
                         return <BotsList />;
                     case 'settings':
@@ -607,6 +610,126 @@
             );
         };
 
+        // Location List Component
+        const LocationList = () => {
+            const [autoShareEnabled, setAutoShareEnabled] = useState(true);
+            
+            const activeShares = [
+                { id: 1, contact: 'Brother', duration: '15 min', timeLeft: '8 min left', type: 'live' },
+                { id: 2, contact: 'Mom', duration: 'Auto-share', timeLeft: 'Active', type: 'auto' },
+            ];
+
+            const recentShares = [
+                { id: 3, contact: 'Brother', time: 'Yesterday 9:30 PM', reason: 'Battery 15%', type: 'auto' },
+                { id: 4, contact: 'Dad', time: '2 days ago', reason: 'No reply (10 min)', type: 'auto' },
+                { id: 5, contact: 'Sister', time: '1 week ago', reason: 'Manual share', type: 'manual' },
+            ];
+
+            return (
+                <div className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Location Sharing</h2>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-600 dark:text-gray-300">Auto Share</span>
+                            <button
+                                onClick={() => setAutoShareEnabled(!autoShareEnabled)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                    autoShareEnabled ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                                }`}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                        autoShareEnabled ? 'translate-x-6' : 'translate-x-1'
+                                    }`}
+                                />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="space-y-2 mb-6">
+                        <button className="w-full gradient-primary text-white p-4 rounded-xl font-semibold hover:scale-[1.02] transition-transform duration-300 shadow-lg">
+                            📍 Share Live Location
+                        </button>
+                        <div className="grid grid-cols-2 gap-2">
+                            <button className="gradient-teal text-white p-3 rounded-xl font-medium hover:scale-[1.02] transition-transform duration-300">
+                                ⚙️ Auto Setup
+                            </button>
+                            <button className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl font-medium hover:scale-[1.02] transition-transform duration-300">
+                                🆘 SOS
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Active Shares */}
+                    {activeShares.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-md font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                                <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse-soft"></div>
+                                Active Shares
+                            </h3>
+                            <div className="space-y-2">
+                                {activeShares.map((share) => (
+                                    <div
+                                        key={share.id}
+                                        className={`${
+                                            share.type === 'live' 
+                                                ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
+                                                : 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+                                        } rounded-xl p-4 hover:shadow-md transition-all duration-300`}
+                                    >
+                                        <div className="flex items-center justify-between mb-2">
+                                            <h4 className="font-semibold text-gray-900 dark:text-white">{share.contact}</h4>
+                                            <span className={`text-sm font-medium ${
+                                                share.type === 'live' ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'
+                                            }`}>
+                                                {share.type === 'live' ? 'LIVE' : 'AUTO'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-gray-600 dark:text-gray-300 text-sm">{share.duration}</p>
+                                            <p className="text-gray-500 dark:text-gray-400 text-sm">{share.timeLeft}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* Recent Shares History */}
+                    <div>
+                        <h3 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Recent Shares</h3>
+                        <div className="space-y-2">
+                            {recentShares.map((share) => (
+                                <div
+                                    key={share.id}
+                                    className="flex items-center p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300"
+                                >
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl shadow-lg ${
+                                        share.type === 'auto' 
+                                            ? 'gradient-indigo' 
+                                            : share.type === 'manual' 
+                                                ? 'gradient-teal' 
+                                                : 'bg-red-500'
+                                    }`}>
+                                        {share.type === 'auto' ? '🤖' : share.type === 'manual' ? '📍' : '🆘'}
+                                    </div>
+                                    
+                                    <div className="flex-1 ml-4 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h4 className="font-semibold text-gray-900 dark:text-white truncate">{share.contact}</h4>
+                                            <span className="text-sm text-gray-500 dark:text-gray-400">{share.time}</span>
+                                        </div>
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm">{share.reason}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // Meetings List Component
         const MeetingsList = () => {
             const upcomingMeetings = [
@@ -670,7 +793,7 @@
                                             </div>
                                             <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
                                                 Join
-                                            </button>
+                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -914,6 +1037,8 @@
                         return <WalletMainView />;
                     case 'meetings':
                         return <MeetingsMainView />;
+                    case 'location':
+                        return <LocationMainView />;
                     case 'bots':
                         return <BotsMainView />;
                     case 'settings':
@@ -1244,6 +1369,498 @@
                             ))}
                         </div>
                     </div>
+                </div>
+            );
+        };
+
+        // Location Main View
+        const LocationMainView = () => {
+            const [autoShareEnabled, setAutoShareEnabled] = useState(true);
+            const [showLiveShareModal, setShowLiveShareModal] = useState(false);
+            const [showAutoSetupModal, setShowAutoSetupModal] = useState(false);
+            const [showSOSModal, setShowSOSModal] = useState(false);
+
+            const activeShares = [
+                { 
+                    id: 1, 
+                    contact: 'Brother', 
+                    avatar: '👨‍💼',
+                    duration: '15 minutes', 
+                    timeLeft: '8 min left', 
+                    type: 'live',
+                    startTime: '2:30 PM'
+                },
+                { 
+                    id: 2, 
+                    contact: 'Mom', 
+                    avatar: '👩‍🦳',
+                    duration: 'Auto-share active', 
+                    timeLeft: 'Always on', 
+                    type: 'auto',
+                    conditions: ['No reply (10 min)', 'Battery < 20%']
+                },
+            ];
+
+            const recentShares = [
+                { 
+                    id: 3, 
+                    contact: 'Brother', 
+                    avatar: '👨‍💼',
+                    time: 'Yesterday 9:30 PM', 
+                    reason: 'Battery 15%', 
+                    type: 'auto',
+                    duration: '30 minutes'
+                },
+                { 
+                    id: 4, 
+                    contact: 'Dad', 
+                    avatar: '👨‍🦳',
+                    time: '2 days ago', 
+                    reason: 'No reply (10 min)', 
+                    type: 'auto',
+                    duration: '1 hour'
+                },
+                { 
+                    id: 5, 
+                    contact: 'Sister', 
+                    avatar: '👩‍🎓',
+                    time: '1 week ago', 
+                    reason: 'Manual share', 
+                    type: 'manual',
+                    duration: '1 hour'
+                },
+                { 
+                    id: 6, 
+                    contact: 'Emergency Services', 
+                    avatar: '🚨',
+                    time: '2 weeks ago', 
+                    reason: 'SOS activated', 
+                    type: 'sos',
+                    duration: 'Until cancelled'
+                }
+            ];
+
+            const trustedContacts = [
+                { id: 1, name: 'Mom', avatar: '👩‍🦳', relationship: 'Mother', autoEnabled: true },
+                { id: 2, name: 'Dad', avatar: '👨‍🦳', relationship: 'Father', autoEnabled: true },
+                { id: 3, name: 'Brother', avatar: '👨‍💼', relationship: 'Brother', autoEnabled: true },
+                { id: 4, name: 'Sister', avatar: '👩‍🎓', relationship: 'Sister', autoEnabled: false },
+                { id: 5, name: 'Best Friend', avatar: '👩‍💻', relationship: 'Friend', autoEnabled: false },
+            ];
+
+            const startLiveShare = () => {
+                setShowLiveShareModal(true);
+            };
+
+            const setupAutoShare = () => {
+                setShowAutoSetupModal(true);
+            };
+
+            const activateSOS = () => {
+                setShowSOSModal(true);
+            };
+
+            return (
+                <div className="p-8 max-w-6xl mx-auto animate-fade-in">
+                    {/* Header */}
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Location Sharing</h1>
+                                <p className="text-xl text-gray-600 dark:text-gray-300">Smart location safety with AI-powered features</p>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <span className="text-lg font-medium text-gray-700 dark:text-gray-300">Auto Share</span>
+                                <button
+                                    onClick={() => setAutoShareEnabled(!autoShareEnabled)}
+                                    className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                                        autoShareEnabled ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                                    }`}
+                                >
+                                    <span
+                                        className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform shadow-lg ${
+                                            autoShareEnabled ? 'translate-x-7' : 'translate-x-1'
+                                        }`}
+                                    />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div 
+                            onClick={startLiveShare}
+                            className="gradient-primary rounded-2xl p-6 text-white cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg"
+                        >
+                            <div className="flex items-center space-x-4">
+                                <div className="text-3xl">📍</div>
+                                <div>
+                                    <h3 className="text-xl font-semibold">Share Live Location</h3>
+                                    <p className="opacity-90">Real-time location for 15min-8hrs</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div 
+                            onClick={setupAutoShare}
+                            className="gradient-teal rounded-2xl p-6 text-white cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg"
+                        >
+                            <div className="flex items-center space-x-4">
+                                <div className="text-3xl">🤖</div>
+                                <div>
+                                    <h3 className="text-xl font-semibold">Auto Setup</h3>
+                                    <p className="opacity-90">Smart conditions & contacts</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div 
+                            onClick={activateSOS}
+                            className="bg-red-500 hover:bg-red-600 rounded-2xl p-6 text-white cursor-pointer hover:scale-105 transition-transform duration-300 shadow-lg"
+                        >
+                            <div className="flex items-center space-x-4">
+                                <div className="text-3xl">🆘</div>
+                                <div>
+                                    <h3 className="text-xl font-semibold">SOS Emergency</h3>
+                                    <p className="opacity-90">Instant help + location</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Active Shares */}
+                    {activeShares.length > 0 && (
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                                <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse-soft"></div>
+                                Active Location Shares
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {activeShares.map((share) => (
+                                    <div key={share.id} className={`rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-[1.02] ${
+                                        share.type === 'live' 
+                                            ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800' 
+                                            : 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800'
+                                    }`}>
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-center space-x-4">
+                                                <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center text-2xl shadow-lg">
+                                                    {share.avatar}
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">{share.contact}</h3>
+                                                    <p className="text-gray-600 dark:text-gray-300">{share.duration}</p>
+                                                </div>
+                                            </div>
+                                            <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                                                share.type === 'live' 
+                                                    ? 'bg-green-500 text-white animate-pulse-soft' 
+                                                    : 'bg-blue-500 text-white'
+                                            }`}>
+                                                {share.type === 'live' ? 'LIVE' : 'AUTO'}
+                                            </span>
+                                        </div>
+                                        
+                                        {share.type === 'live' ? (
+                                            <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-gray-600 dark:text-gray-300">Time remaining:</span>
+                                                    <span className="font-bold text-green-600 dark:text-green-400">{share.timeLeft}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between mt-2">
+                                                    <span className="text-gray-600 dark:text-gray-300">Started at:</span>
+                                                    <span className="font-medium text-gray-900 dark:text-white">{share.startTime}</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
+                                                <p className="text-gray-600 dark:text-gray-300 mb-2">Active conditions:</p>
+                                                <div className="space-y-1">
+                                                    {share.conditions.map((condition, index) => (
+                                                        <div key={index} className="flex items-center space-x-2">
+                                                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                                            <span className="text-sm text-gray-700 dark:text-gray-300">{condition}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="flex space-x-3 mt-4">
+                                            <button className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
+                                                Modify
+                                            </button>
+                                            <button className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-medium transition-colors duration-300">
+                                                Stop
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Trusted Contacts */}
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Trusted Contacts</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                            {trustedContacts.map((contact, index) => (
+                                <div key={contact.id} className={`flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 ${
+                                    index !== trustedContacts.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''
+                                }`}>
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center text-2xl shadow-lg">
+                                            {contact.avatar}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{contact.name}</h3>
+                                            <p className="text-gray-600 dark:text-gray-300">{contact.relationship}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center space-x-4">
+                                        <div className="text-center">
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">Auto Share</p>
+                                            <button
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                    contact.autoEnabled ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                        contact.autoEnabled ? 'translate-x-6' : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                        <button className="gradient-primary text-white px-4 py-2 rounded-xl font-medium hover:scale-105 transition-transform duration-300">
+                                            Configure
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Recent Shares History */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Location History</h2>
+                        <div className="space-y-4">
+                            {recentShares.map((share) => (
+                                <div key={share.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center space-x-4">
+                                            <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-lg ${
+                                                share.type === 'auto' 
+                                                    ? 'gradient-indigo' 
+                                                    : share.type === 'manual' 
+                                                        ? 'gradient-teal' 
+                                                        : share.type === 'sos'
+                                                            ? 'bg-red-500'
+                                                            : 'gradient-primary'
+                                            }`}>
+                                                {share.type === 'auto' ? '🤖' : share.type === 'manual' ? '📍' : share.type === 'sos' ? '🆘' : '📱'}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex items-center space-x-3 mb-2">
+                                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">{share.contact}</h3>
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                                        share.type === 'auto' ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' :
+                                                        share.type === 'manual' ? 'bg-teal-100 dark:bg-teal-900 text-teal-600 dark:text-teal-400' :
+                                                        share.type === 'sos' ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400' :
+                                                        'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                                    }`}>
+                                                        {share.type.toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-600 dark:text-gray-300 mb-1">{share.reason}</p>
+                                                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                                    <span>{share.time}</span>
+                                                    <span>•</span>
+                                                    <span>Duration: {share.duration}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2">
+                                            <Icon name="MoreVertical" size={20} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Live Share Modal */}
+                    {showLiveShareModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Share Live Location</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select contacts</label>
+                                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                                            {trustedContacts.slice(0, 3).map((contact) => (
+                                                <label key={contact.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <input type="checkbox" className="rounded" />
+                                                    <span className="text-lg">{contact.avatar}</span>
+                                                    <span className="text-gray-900 dark:text-white">{contact.name}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Duration</label>
+                                        <select className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl border-0 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <option>15 minutes</option>
+                                            <option>1 hour</option>
+                                            <option>8 hours</option>
+                                            <option>Until I stop</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="flex space-x-3 mt-6">
+                                    <button
+                                        onClick={() => setShowLiveShareModal(false)}
+                                        className="flex-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-300"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowLiveShareModal(false);
+                                            alert('📍 Live location sharing started!\n\nYour selected contacts will receive your real-time location with secure encrypted sharing.');
+                                        }}
+                                        className="flex-1 gradient-primary text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-transform duration-300"
+                                    >
+                                        Start Sharing
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Auto Setup Modal */}
+                    {showAutoSetupModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[80vh] overflow-y-auto">
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Auto Location Setup</h3>
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Choose trusted contacts</label>
+                                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                                            {trustedContacts.map((contact) => (
+                                                <label key={contact.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <input type="checkbox" className="rounded" defaultChecked={contact.autoEnabled} />
+                                                    <span className="text-lg">{contact.avatar}</span>
+                                                    <span className="text-gray-900 dark:text-white">{contact.name}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Auto-share conditions</label>
+                                        <div className="space-y-3">
+                                            <label className="flex items-center space-x-3">
+                                                <input type="checkbox" className="rounded" defaultChecked />
+                                                <span className="text-gray-900 dark:text-white">No reply within</span>
+                                                <select className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm">
+                                                    <option>5 min</option>
+                                                    <option selected>10 min</option>
+                                                    <option>20 min</option>
+                                                    <option>1 hour</option>
+                                                </select>
+                                            </label>
+                                            
+                                            <label className="flex items-center space-x-3">
+                                                <input type="checkbox" className="rounded" defaultChecked />
+                                                <span className="text-gray-900 dark:text-white">Battery level below</span>
+                                                <select className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm">
+                                                    <option>10%</option>
+                                                    <option selected>20%</option>
+                                                    <option>30%</option>
+                                                </select>
+                                            </label>
+                                            
+                                            <label className="flex items-center space-x-3">
+                                                <input type="checkbox" className="rounded" />
+                                                <span className="text-gray-900 dark:text-white">Entering risky area (Geo-fence)</span>
+                                            </label>
+                                            
+                                            <label className="flex items-center space-x-3">
+                                                <input type="checkbox" className="rounded" />
+                                                <span className="text-gray-900 dark:text-white">After 10 PM (Night safety)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Auto-share duration</label>
+                                        <select className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-xl border-0 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <option>15 minutes</option>
+                                            <option selected>30 minutes</option>
+                                            <option>1 hour</option>
+                                            <option>Until safe</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="flex space-x-3 mt-6">
+                                    <button
+                                        onClick={() => setShowAutoSetupModal(false)}
+                                        className="flex-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-300"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowAutoSetupModal(false);
+                                            alert('🤖 Auto location sharing configured!\n\nYour location will be automatically shared based on the conditions you set. Smart safety is now active.');
+                                        }}
+                                        className="flex-1 gradient-teal text-white px-6 py-3 rounded-xl font-semibold hover:scale-105 transition-transform duration-300"
+                                    >
+                                        Save Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* SOS Modal */}
+                    {showSOSModal && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl border-4 border-red-500">
+                                <div className="text-center">
+                                    <div className="text-6xl mb-4">🆘</div>
+                                    <h3 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Emergency SOS</h3>
+                                    <p className="text-gray-700 dark:text-gray-300 mb-6">
+                                        This will immediately send your location and a "Help Me" message to all trusted contacts and emergency services.
+                                    </p>
+                                    <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 mb-6">
+                                        <p className="text-red-700 dark:text-red-300 text-sm">
+                                            ⚠️ Only use in real emergencies. False alarms may result in emergency response.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex space-x-3">
+                                    <button
+                                        onClick={() => setShowSOSModal(false)}
+                                        className="flex-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors duration-300"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowSOSModal(false);
+                                            alert('🚨 SOS ACTIVATED!\n\nEmergency message sent to:\n• All trusted contacts\n• Emergency services\n• Location shared continuously\n\nHelp is on the way!');
+                                        }}
+                                        className="flex-1 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-bold hover:scale-105 transition-transform duration-300 animate-pulse-soft"
+                                    >
+                                        ACTIVATE SOS
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
@@ -2505,5 +3122,5 @@
 
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98931d03d1407e72',t:'MTc1OTU2NDQ4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98932b5476ef17a7',t:'MTc1OTU2NTA3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
